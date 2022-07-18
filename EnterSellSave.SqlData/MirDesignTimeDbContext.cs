@@ -13,7 +13,7 @@ namespace EnterSellSave.SqlData
         public MirDbContext CreateDbContext(string[] args)
         {
             DbContextOptionsBuilder<MirDbContext> builder = new();
-            builder.UseSqlServer("Server=ChrisServer;Initial Catalog=EnterSellSave;Persist Security Info=False;User ID=sa;Password=1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=300;");
+            builder.UseSqlServer("Server=ChrisServer;Initial Catalog=EnterSellSave;Persist Security Info=False;User ID=sa;Password=1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
             return new MirDbContext(builder.Options);
         }
     }

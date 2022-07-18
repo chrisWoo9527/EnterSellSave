@@ -11,8 +11,8 @@ namespace EnterSellSave.SqlData
 
         public MirDbContext(DbContextOptions<MirDbContext> options) : base(options)
         {
-            // 设置超时时间
-             this.Database.SetCommandTimeout(60);
+             // 设置超时时间
+             this.Database.SetCommandTimeout(30);
         }
 
 
