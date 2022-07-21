@@ -2,11 +2,15 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using EnterSellSave.Common.AutoFacManager;
 using EnterSellSave.Common.BaseOptions;
+using EnterSellSave.Host;
+using EnterSellSave.Host.Filter;
+using EnterSellSave.Services.Attributes;
 using EnterSellSave.SqlData;
 using EnterSellSave.SqlData.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,13 +27,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+ConfigurationManager _configuration = builder.Configuration;
+
 #region 注入Jwt的服务
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtOptions>(_configuration.GetSection("Jwt"));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
-        var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+        var jwtOptions = _configuration.GetSection("Jwt").Get<JwtOptions>();
         byte[] secBytes = Encoding.UTF8.GetBytes(jwtOptions.SecKey);
         var symmetricSecurityKey = new SymmetricSecurityKey(secBytes);
         opt.TokenValidationParameters = new TokenValidationParameters
@@ -73,14 +79,14 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<MirDbContext>(opt =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("default");
+    var connectionString = _configuration.GetConnectionString("default");
     if (string.IsNullOrEmpty(connectionString))
     {
         throw new ArgumentException("配置信息错误,请联系管理员核查~~~");
     }
 
     opt.UseSqlServer(connectionString);
-    
+
 });
 
 #endregion
@@ -143,6 +149,39 @@ builder.Services.Configure<FormOptions>(x =>
 builder.Services.Configure<KestrelServerOptions>(x =>
 {
     x.Limits.MaxRequestBodySize = (long)1024 * 1024 * 1024;
+});
+
+#endregion
+
+
+#region 注入redis缓存服务
+
+builder.Services.AddStackExchangeRedisCache(opt =>
+{
+    opt.Configuration = _configuration.GetSection("Redis:Cache:Configuration").Value;
+    opt.InstanceName = _configuration.GetSection("Redis:Cache:InstanceName").Value;
+});
+
+#endregion
+
+
+
+#region 注入Httpfactory工厂
+
+builder.Services.AddHttpClient(BasisConsts.OtherServices, config =>
+{
+    config.BaseAddress = new Uri(_configuration.GetSection("ThirdPartyServices:TestServices").Value);
+    config.Timeout = TimeSpan.FromSeconds(60);
+});
+
+#endregion
+
+
+#region 注入Filter 
+
+builder.Services.Configure<MvcOptions>(opt =>
+{
+    opt.Filters.Add<CheckJwtVersionFilter>();
 });
 
 #endregion

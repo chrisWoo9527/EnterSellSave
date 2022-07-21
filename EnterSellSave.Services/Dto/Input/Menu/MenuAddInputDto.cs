@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EnterSellSave.Services.Dto.Input
+namespace EnterSellSave.Services.Dto.Input.Menu
 {
-    public class MenuInputDto
+    public class MenuAddInputDto
     {
         /// <summary>
         /// 父节点ID

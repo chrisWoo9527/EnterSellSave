@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EnterSellSave.SqlData.Migrations
 {
     [DbContext(typeof(MirDbContext))]
-    [Migration("20220717095551_initadd")]
-    partial class initadd
+    [Migration("20220719051054_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,6 +64,61 @@ namespace EnterSellSave.SqlData.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("T_Department", (string)null);
+                });
+
+            modelBuilder.Entity("EnterSellSave.SqlData.Model.Menu", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("CreateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("LastModifierId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("LastModifyTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NamespaceClassName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("SerialNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("Index");
+
+                    b.HasIndex("LastModifierId");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("T_Menu", (string)null);
                 });
 
             modelBuilder.Entity("EnterSellSave.SqlData.Model.Role", b =>
@@ -313,6 +368,27 @@ namespace EnterSellSave.SqlData.Migrations
                         .IsRequired();
 
                     b.HasOne("EnterSellSave.SqlData.Model.Department", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("LastModifier");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("EnterSellSave.SqlData.Model.Menu", b =>
+                {
+                    b.HasOne("EnterSellSave.SqlData.Model.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+
+                    b.HasOne("EnterSellSave.SqlData.Model.User", "LastModifier")
+                        .WithMany()
+                        .HasForeignKey("LastModifierId");
+
+                    b.HasOne("EnterSellSave.SqlData.Model.Menu", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId");
 

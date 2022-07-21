@@ -12,6 +12,7 @@ namespace EnterSellSave.SqlData.Config
             builder.Property(p => p.RealName).HasMaxLength(50);
             builder.Property(p => p.IdCard).HasMaxLength(50);
             builder.Property(p => p.Status).HasDefaultValue(LivingStatus.启用);
+            builder.Property(p => p.Gender).HasDefaultValue(Gender.未知);
         }
     }
 }

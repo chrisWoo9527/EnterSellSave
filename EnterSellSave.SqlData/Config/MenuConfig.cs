@@ -14,6 +14,8 @@ namespace EnterSellSave.SqlData.Config
             builder.HasIndex(p => p.Index);
             builder.Property(p => p.Name).HasMaxLength(100);
             builder.Property(p => p.NamespaceClassName).HasMaxLength(100);
+            builder.HasOne<User>(m => m.Creator).WithOne().HasForeignKey<Menu>(m => m.CreatorId);
+            builder.HasOne<User>(m => m.LastModifier).WithOne().HasForeignKey<Menu>(m => m.LastModifierId).OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

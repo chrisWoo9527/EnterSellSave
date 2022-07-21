@@ -15,7 +15,6 @@ namespace EnterSellSave.SqlData
              this.Database.SetCommandTimeout(60);
         }
 
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -40,6 +40,7 @@ namespace EnterSellSave.SqlData.Model
 
         public User? Creator { get; set; }
 
+        public long CreatorId { get; set; }
 
         /// <summary>
         /// 创建日期
@@ -50,6 +51,8 @@ namespace EnterSellSave.SqlData.Model
         /// 最后修改人
         /// </summary>
         public User? LastModifier { get; set; }
+
+        public long LastModifierId { get; set; }
 
         /// <summary>
         /// 最后修改日期

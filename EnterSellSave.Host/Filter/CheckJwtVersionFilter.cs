@@ -1,22 +1,24 @@
-﻿using EnterSellSave.Services.Attributes;
+﻿using EnterSellSave.Common;
+using EnterSellSave.Services.Attributes;
+using EnterSellSave.Services.BasicsServices.HelperServices;
 using EnterSellSave.SqlData.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace EnterSellSave.Host.Filter
 {
     public class CheckJwtVersionFilter : IAsyncActionFilter
     {
         private readonly UserManager<User> userManager;
-        private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCacheHelper _distributedCache;
 
-        public CheckJwtVersionFilter(UserManager<User> userManager, IMemoryCache memoryCache)
+        public CheckJwtVersionFilter(UserManager<User> userManager,
+            IDistributedCacheHelper distributedCache)
         {
             this.userManager = userManager;
-            this.memoryCache = memoryCache;
+            _distributedCache = distributedCache;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -34,30 +36,42 @@ namespace EnterSellSave.Host.Filter
                 return;
             }
 
-            var claimUserName = context.HttpContext.User.FindFirst("UserName");
-
-            string cacheKey = $"{claimUserName!.Value}";
-            User user = await memoryCache.GetOrCreateAsync(cacheKey, async e =>
+            try
             {
-                int expricetimes = Random.Shared.Next(5, 10);
-                e.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(5);
-                return await userManager.FindByNameAsync(claimUserName.Value);
-            });
+                var claimUserName = context.HttpContext.User.FindFirst("UserName");
 
-            if (user.JwtVersion > Convert.ToInt64(context.HttpContext.User.FindFirst("JwtVersion").Value))
-            {
-                ObjectResult objectResult = new ObjectResult("令牌失效")
+                string cacheKey = $"{claimUserName.Value}";
+
+                User? user = await _distributedCache.GetOrCreateAsync<User>(cacheKey, async e =>
                 {
-                    StatusCode = 401
-                };
-                context.Result = objectResult;
-                return;
+                    return await userManager.FindByNameAsync(claimUserName.Value);
+                });
+
+                // 登陆信息存储
+                LoginInfo.UserName = user.UserName;
+                LoginInfo.UserId = user.Id;
+                //LoginInfo.DepartmentId = user.Department.Id;
+
+                if (user.JwtVersion > Convert.ToInt64(context.HttpContext.User.FindFirst("JwtVersion").Value))
+                {
+                    ObjectResult objectResult = new ObjectResult("令牌失效")
+                    {
+                        StatusCode = 401
+                    };
+                    context.Result = objectResult;
+                    return;
+                }
+                else
+                {
+                    await next();
+                    return;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await next();
-                return;
+                throw new Exception(ex.Message);
             }
+
         }
     }
 }
