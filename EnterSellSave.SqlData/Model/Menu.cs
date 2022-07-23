@@ -1,4 +1,5 @@
-﻿using EnterSellSave.Common;
+﻿using Abp.Domain.Entities;
+using EnterSellSave.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EnterSellSave.SqlData.Model
 {
-    public class Menu
+    public class Menu : Entity<long>
     {
         /// <summary>
         /// 主键ID
@@ -38,8 +39,6 @@ namespace EnterSellSave.SqlData.Model
         public int? SerialNumber { get; set; }
 
 
-        public User? Creator { get; set; }
-
         public long CreatorId { get; set; }
 
         /// <summary>
@@ -50,7 +49,6 @@ namespace EnterSellSave.SqlData.Model
         /// <summary>
         /// 最后修改人
         /// </summary>
-        public User? LastModifier { get; set; }
 
         public long LastModifierId { get; set; }
 

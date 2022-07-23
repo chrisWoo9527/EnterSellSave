@@ -15,8 +15,6 @@ namespace EnterSellSave.SqlData.Config
             builder.Property(p => p.Code).HasMaxLength(50);
             builder.Property(p => p.Name).HasMaxLength(200);
             builder.Property(p => p.Status).HasDefaultValue(LivingStatus.启用);
-            builder.HasOne<User>(k => k.Creator).WithMany();
-            builder.HasOne<User>(k => k.LastModifier).WithMany();
             //builder.HasOne<User>(k => k.LastModifier).WithOne(v => v.Department).HasForeignKey<User>(v => v.DepartmentId);
             //builder.HasOne<User>(k => k.LastModifier).WithOne(v => v.Department);
         }

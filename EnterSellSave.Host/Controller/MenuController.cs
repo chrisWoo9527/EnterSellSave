@@ -39,7 +39,7 @@ namespace EnterSellSave.Host.Controller
         }
 
 
-
+        [CheckJwtVersion]
         [HttpDelete("DeleteMenu/{Id}")]
         public async Task<ActionResult<ResponseDto>> DeleteMenu(long Id)
         {
@@ -49,5 +49,9 @@ namespace EnterSellSave.Host.Controller
 
 
         [HttpGet]
+        public async Task<ActionResult<ResponseDto>> QueryMenu()
+        {
+            return null;
+        }
     }
 }

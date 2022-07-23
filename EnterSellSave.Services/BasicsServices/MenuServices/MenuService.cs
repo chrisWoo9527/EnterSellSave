@@ -1,4 +1,5 @@
-﻿using EnterSellSave.Common;
+﻿using Abp.Domain.Repositories;
+using EnterSellSave.Common;
 using EnterSellSave.Common.AutoFacManager;
 using EnterSellSave.Services.Dto.BasicsDto;
 using EnterSellSave.Services.Dto.Input.Menu;
@@ -15,18 +16,19 @@ namespace EnterSellSave.Services.BasicsServices.MenuServices
 {
     public class MenuService : IMenuService, IScopeService
     {
+        private readonly IRepository<Menu,long> _menuRepository;
 
-        private readonly MirDbContext _dbContext;
-
-        public MenuService(MirDbContext dbContext)
+        public MenuService(IRepository<Menu, long> menuRepository)
         {
-            _dbContext = dbContext;
+            _menuRepository = menuRepository;
         }
 
         public async Task<ResponseDto> AddMenu(MenuAddInputDto input)
         {
             // 父类
-            Menu? parentMenu = _dbContext.Menus.FirstOrDefault(p => p.Id == input.ParentId);
+            //Menu? parentMenu = _dbContext.Menus.FirstOrDefault(p => p.Id == input.ParentId);
+
+            Menu? parentMenu = _menuRepository.GetAll().FirstOrDefault(p => p.Id == input.ParentId);
             DateTime dateTime = DateTime.Now;
             Menu newMenu = new Menu
             {
@@ -40,6 +42,8 @@ namespace EnterSellSave.Services.BasicsServices.MenuServices
                 LastModifierId = LoginInfo.UserId,
                 LastModifyTime = dateTime
             };
+
+            await _menuRepository.InsertAsync(newMenu);
 
             await _dbContext.Menus.AddAsync(newMenu);
             await _dbContext.SaveChangesAsync();

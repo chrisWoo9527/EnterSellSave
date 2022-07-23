@@ -25,7 +25,10 @@ namespace EnterSellSave.SqlData.Migrations
             modelBuilder.Entity("EnterSellSave.SqlData.Model.Department", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -36,6 +39,9 @@ namespace EnterSellSave.SqlData.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("CreatorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("LastModifierId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("LastModifyTime")
@@ -55,8 +61,6 @@ namespace EnterSellSave.SqlData.Migrations
                         .HasDefaultValue(1);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatorId");
 
                     b.HasIndex("ParentId");
 
@@ -107,13 +111,7 @@ namespace EnterSellSave.SqlData.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId")
-                        .IsUnique();
-
                     b.HasIndex("Index");
-
-                    b.HasIndex("LastModifierId")
-                        .IsUnique();
 
                     b.HasIndex("ParentId");
 
@@ -358,48 +356,18 @@ namespace EnterSellSave.SqlData.Migrations
 
             modelBuilder.Entity("EnterSellSave.SqlData.Model.Department", b =>
                 {
-                    b.HasOne("EnterSellSave.SqlData.Model.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatorId");
-
-                    b.HasOne("EnterSellSave.SqlData.Model.User", "LastModifier")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EnterSellSave.SqlData.Model.Department", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId");
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("LastModifier");
 
                     b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("EnterSellSave.SqlData.Model.Menu", b =>
                 {
-                    b.HasOne("EnterSellSave.SqlData.Model.User", "Creator")
-                        .WithOne()
-                        .HasForeignKey("EnterSellSave.SqlData.Model.Menu", "CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EnterSellSave.SqlData.Model.User", "LastModifier")
-                        .WithOne()
-                        .HasForeignKey("EnterSellSave.SqlData.Model.Menu", "LastModifierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("EnterSellSave.SqlData.Model.Menu", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId");
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("LastModifier");
 
                     b.Navigation("Parent");
                 });
